@@ -12,6 +12,8 @@ public class Player : MonoBehaviour {
 
 	public static int score = 0;
 
+	private bool touchFlag = false;
+
 	// Use this for initialization
 	void Start () {
 		bottomPivot = this.transform.position.y;
@@ -43,6 +45,24 @@ public class Player : MonoBehaviour {
 		}
 
 		/*
+		 * touch jump
+		 */
+		if (Input.touchCount > 0 && !this.touchFlag) {
+			this.touchFlag = true;
+			if (this.isJumping) {
+				if (this.jumpingSpeed < 0.0f) {
+					this.jumpingSpeed += 20.0f;
+				}
+			} else {
+				this.jumpingSpeed = this.jumpSpeed;
+				this.isJumping = true;
+				animator.Play ("jump");
+			}
+		} else {
+			this.touchFlag = false;
+		}
+
+		/*
 		 * ㅈㅓㅁㅍㅡ ㅈㅜㅇㅇㅣㅁㅕㄴ ㅈㅓㅁㅍㅡ ㅎㅏㅁㅅㅜ ㅎㅗㅊㅜㄹ
 		 */
 		if (isJumping) {
@@ -59,7 +79,7 @@ public class Player : MonoBehaviour {
 		 * if cat's position Y is under bottom pivot
 		 * quit jump state and cat's position Y to bottom pivot
 		 * ㄱㅣㅈㅜㄴ ㅅㅓㄴㅇㅔ ㅁㅏㅈㅊㅜㄱㅗ ㅈㅓㅁㅍㅡ ㅈㅗㅇㄹㅛ
-		 * ㅎㅏㄴㄱㅡㄹ ㅇㅗㅐ ㅇㅣㄹㅐ ㅇㅏㅇㅏㅇㅏ
+		 * ㅎㅏㄴㄱㅡㄹ ㅇㅗㅐ ㅇㅣㄹㅐ ㅇㅏㅇㅏㅇㅏ 
 		 */
 		if(this.transform.position.y + jumpingSpeed*deltaTime < bottomPivot) {
 			this.transform.position = new Vector3(this.transform.position.x, bottomPivot, this.transform.position.z);
@@ -86,6 +106,7 @@ public class Player : MonoBehaviour {
 		else if (other.gameObject.tag == "Hole") {
 			GameObject.Destroy(other.gameObject);
 			score = score + 1;
+
 		}
 	}
 	
