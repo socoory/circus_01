@@ -12,7 +12,7 @@ public class Ring : MonoBehaviour {
 
 		float y = Random.Range (0.0f, 2.0f) > 1.0f ? 2.1f : 1.5f;
 
-		this.transform.position = new Vector3 (8.0f, y, 0.0f);
+		this.transform.position = new Vector3 (10.0f, y, 0.0f);
 
 		float gen = Random.Range (0.0f, 10.0f);
 		if (gen > 9.5f) {

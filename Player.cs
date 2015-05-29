@@ -9,7 +9,13 @@ public class Player : MonoBehaviour {
 	private bool isJumping = false;
 	private Animator animator;
 	private bool isDamaging = false;
+	private Rect windowRect = new Rect ((Screen.width)/4, (Screen.height)/3, (Screen.width)/2, (Screen.height)/3);
+	private bool show = false;
 
+	public static int score = 0;
+
+	private bool touchFlag = false;
+	private int dialogFlag = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -23,7 +29,7 @@ public class Player : MonoBehaviour {
 		/*
 		 * jump
 		 */
-		if (Input.touchCount > 0) {
+		if (Input.GetKeyDown (KeyCode.C)) {
 			if (this.isJumping) {
 			} else {
 				this.jumpingSpeed = this.jumpSpeed;
@@ -42,21 +48,83 @@ public class Player : MonoBehaviour {
 		}
 
 		/*
+		 * touch jump
+		 */
+		if (Input.touchCount > 0 && !this.touchFlag) {
+			this.touchFlag = true;
+			if (this.isJumping) {
+				if (this.jumpingSpeed < 0.0f) {
+					this.jumpingSpeed += 20.0f;
+				}
+			} else {
+				this.jumpingSpeed = this.jumpSpeed;
+				this.isJumping = true;
+				animator.Play ("jump");
+			}
+		} else {
+			//this.touchFlag = false;
+		}
+
+		if (Input.touchCount == 0) {
+			this.touchFlag = false;
+		}
+
+		/*
 		 * ㅈㅓㅁㅍㅡ ㅈㅜㅇㅇㅣㅁㅕㄴ ㅈㅓㅁㅍㅡ ㅎㅏㅁㅅㅜ ㅎㅗㅊㅜㄹ
 		 */
 		if (isJumping) {
 			handleJump (Time.deltaTime);
 		}
+
+		/*
+		 * 뒤로가기 키로 게임을 종료
+		 */
 		if(Application.platform == RuntimePlatform.Android)
 		{
-			if(Input.GetKey(KeyCode.Escape))
+			if(Input.GetKeyDown(KeyCode.Escape))
 			{
-				 Application.Quit();
+				if(show) {					
+					Time.timeScale = 1;
+					show = false;
+				}
+				else {
+					Time.timeScale = 0;
+					show = true;
+				}
 			}
 		}
 	}
 
-
+	void OnGUI() {
+		GUIStyle myButtonStyle1 = new GUIStyle(GUI.skin.button);
+		myButtonStyle1.fontSize = Screen.height/10;
+		if(show)
+			windowRect = GUI.Window (0, windowRect, DialogWindow, "", myButtonStyle1);
+	}
+	
+	void DialogWindow (int windowID)
+	{
+		
+		GUIStyle myButtonStyle2 = new GUIStyle(GUI.skin.button);
+		myButtonStyle2.fontSize = Screen.height / 12;
+		float y = Screen.height / 6;
+		
+		if(GUI.Button(new Rect(5, 0, windowRect.width - 10, y), "Restart", myButtonStyle2))
+		{
+			Time.timeScale = 1;
+			Application.LoadLevel (0);
+			Player.score = 0;
+			Stage.globalTime = 0.0f;
+			show = false;
+		}
+		
+		if(GUI.Button(new Rect(5, y, windowRect.width - 10, y), "Exit", myButtonStyle2))
+		{
+			Application.Quit();
+			show = false;
+		}
+	}
+	
 	/**
 	 * ㅈㅓㅁㅍㅡ ㅊㅓㄹㅣ
 	 **/
@@ -90,10 +158,9 @@ public class Player : MonoBehaviour {
 			}
 		}
 		else if (other.gameObject.tag == "Hole") {
-			/*
-			 * ㅈㅓㅁㅅㅜ ㅇㅓㄷㄴㅡㄴ ㅂㅜㅂㅜㄴ
-			 */
-			Debug.Log ("Hole");
+			GameObject.Destroy(other.gameObject);
+			score = score + 1;
+
 		}
 	}
 	
