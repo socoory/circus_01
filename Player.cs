@@ -6,6 +6,7 @@ public class Player : MonoBehaviour {
 	private float jumpingSpeed;
 	private float gravity = 80.0f;
 	private float bottomPivot;
+	private float deadPivot;
 	private bool isJumping = false;
 	private Animator animator;
 	private bool isDamaging = false;
@@ -19,10 +20,12 @@ public class Player : MonoBehaviour {
 	public AudioSource jumpSoundSource;
 	public AudioSource damageSoundSource;
 	private bool touchFlag = false;
-	
+	private int dead = 0;
+
 	// Use this for initialization
 	void Start () {
 		bottomPivot = this.transform.position.y;
+		deadPivot = this.transform.position.y + 1.0f;
 		this.animator = this.GetComponent<Animator> ();
 		//source = GetComponent<AudioSource> ();
 	}
@@ -77,6 +80,18 @@ public class Player : MonoBehaviour {
 		if (isJumping) {
 			handleJump (Time.deltaTime);
 		}
+
+		if (this.dead == 1) {
+			isJumping = true;
+			this.jumpingSpeed = 10.0f;
+			bottomPivot = -10.0f;
+			dead = 2;
+		}
+
+		else if (this.dead == 3) {
+			Time.timeScale = 0;
+			Debug.Log ("die");
+		}
 	}
 
 
@@ -94,7 +109,8 @@ public class Player : MonoBehaviour {
 			this.transform.position = new Vector3(this.transform.position.x, bottomPivot, this.transform.position.z);
 			this.isJumping = false;
 
-			if(animator.GetCurrentAnimatorStateInfo(0).shortNameHash != Animator.StringToHash("damage")) {
+//			if(animator.GetCurrentAnimatorStateInfo(0).shortNameHash != Animator.StringToHash("damage")) {
+			if(this.dead == 0) {
 				animator.Play("ready");
 			}
 		}
@@ -104,6 +120,15 @@ public class Player : MonoBehaviour {
 
 		this.jumpingSpeed -= gravity*deltaTime;
 	}
+
+	public void die() {
+		this.dead = 3;
+		Debug.Log ("die called");
+	}
+	
+	public void dieStart() {
+		this.dead = 1;
+	}
 	
 
 	public void OnTriggerEnter2D(Collider2D other) {
@@ -111,17 +136,15 @@ public class Player : MonoBehaviour {
 			if (this.animator != null) {
 				this.animator.Play ("damage");
 				damageSoundSource.PlayOneShot(damageSound);
-				damage = damage +1;
-				Debug.Log (damage);
+				this.dieStart ();
 			}
 		}
 		else if (other.gameObject.tag == "Hole") {
 			GameObject.Destroy(other.gameObject);
 			score = score + 1;
-
 		}
 	}
-	
+
 	public void OnTriggerExit2D(Collider2D other) {
 	}
 }
