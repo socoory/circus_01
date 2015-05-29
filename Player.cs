@@ -10,6 +10,9 @@ public class Player : MonoBehaviour {
 	private Animator animator;
 	private bool isDamaging = false;
 
+	public static int score = 0;
+
+	private bool touchFlag = false;
 
 	// Use this for initialization
 	void Start () {
@@ -23,7 +26,7 @@ public class Player : MonoBehaviour {
 		/*
 		 * jump
 		 */
-		if (Input.touchCount > 0) {
+		if (Input.GetKeyDown (KeyCode.C)) {
 			if (this.isJumping) {
 			} else {
 				this.jumpingSpeed = this.jumpSpeed;
@@ -42,18 +45,30 @@ public class Player : MonoBehaviour {
 		}
 
 		/*
-		 * ㅈㅓㅁㅍㅡ ㅈㅜㅇㅇㅣㅁㅕㄴ ㅈㅓㅁㅍㅡ ㅎㅏㅁㅅㅜ ㅎㅗㅊㅜㄹ
+		 * touch jump
 		 */
-		if (isJumping) {
-			handleJump (Time.deltaTime);
+		if (Input.touchCount > 0 && !this.touchFlag) {
+			this.touchFlag = true;
+			if (this.isJumping) {
+				if (this.jumpingSpeed < 0.0f) {
+					this.jumpingSpeed += 20.0f;
+				}
+			} else {
+				this.jumpingSpeed = this.jumpSpeed;
+				this.isJumping = true;
+				animator.Play ("jump");
+			}
+		} else {
+			this.touchFlag = false;
 		}
-		if(Application.platform == RuntimePlatform.Android)
+        
+        if(Application.platform == RuntimePlatform.Android)
 		{
 			if(Input.GetKey(KeyCode.Escape))
 			{
 				 Application.Quit();
 			}
-		}
+		}		
 	}
 
 
@@ -90,10 +105,8 @@ public class Player : MonoBehaviour {
 			}
 		}
 		else if (other.gameObject.tag == "Hole") {
-			/*
-			 * ㅈㅓㅁㅅㅜ ㅇㅓㄷㄴㅡㄴ ㅂㅜㅂㅜㄴ
-			 */
-			Debug.Log ("Hole");
+			GameObject.Destroy(other.gameObject);
+			score = score + 1;
 		}
 	}
 	
