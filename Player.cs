@@ -10,14 +10,21 @@ public class Player : MonoBehaviour {
 	private Animator animator;
 	private bool isDamaging = false;
 
+	public AudioClip damageSound;
+	public AudioClip jumpSound;
+
 	public static int score = 0;
+	public static int damage = 0;
 
+	public AudioSource jumpSoundSource;
+	public AudioSource damageSoundSource;
 	private bool touchFlag = false;
-
+	
 	// Use this for initialization
 	void Start () {
 		bottomPivot = this.transform.position.y;
 		this.animator = this.GetComponent<Animator> ();
+		//source = GetComponent<AudioSource> ();
 	}
 
 
@@ -32,6 +39,7 @@ public class Player : MonoBehaviour {
 				this.jumpingSpeed = this.jumpSpeed;
 				this.isJumping = true;
 				animator.Play("jump");
+				jumpSoundSource.PlayOneShot(jumpSound);
 			}
 		}
 		/*
@@ -57,6 +65,7 @@ public class Player : MonoBehaviour {
 				this.jumpingSpeed = this.jumpSpeed;
 				this.isJumping = true;
 				animator.Play ("jump");
+				jumpSoundSource.PlayOneShot(jumpSound);
 			}
 		} else {
 			this.touchFlag = false;
@@ -98,9 +107,12 @@ public class Player : MonoBehaviour {
 	
 
 	public void OnTriggerEnter2D(Collider2D other) {
-		if (other.gameObject.tag == "Ring") {
+		if (other.gameObject.tag == "Ring" && isDamaging == false) {
 			if (this.animator != null) {
 				this.animator.Play ("damage");
+				damageSoundSource.PlayOneShot(damageSound);
+				damage = damage +1;
+				Debug.Log (damage);
 			}
 		}
 		else if (other.gameObject.tag == "Hole") {
