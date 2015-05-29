@@ -19,7 +19,7 @@ public class Stage : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		this.speed = -6.0f;
-		this.bgSpeed = -4.0f;
+		this.bgSpeed = -5.0f;
 		this.freq = 2.0f;
 		this.dTime = 0.0f;
 	}
@@ -30,13 +30,14 @@ public class Stage : MonoBehaviour {
 		dTime += Time.deltaTime;
 		globalTime += Time.deltaTime;
 
-		if(dTime > freq) {
+		if (dTime > freq) {
 			dTime = 0.0f;
-			genRing();
+			genRing ();
 		}
 
 		if (freq > 1.0f) {
 			freq -= globalTime * Time.deltaTime / 10000.0f;
+			bgSpeed -= globalTime * Time.deltaTime / 1000.0f;
 		}
 
 		moveBG (Time.deltaTime);

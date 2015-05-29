@@ -30,7 +30,6 @@ public class UICanvas : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		score = Player.score/2;
-		Debug.Log (score);
 		one = score % 10;
 		ten = (score % 100) / 10;
 		hundred = (score % 1000) / 100;
