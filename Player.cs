@@ -97,6 +97,9 @@ public class Player : MonoBehaviour {
 		else if (this.dead == 3) {
 			Time.timeScale = 0;
 			Debug.Log ("die");
+			Application.LoadLevel(0);
+			Player.score = 0;
+			Stage.globalTime = 0.0f;
 		}
 		/*
 		 * 뒤로가기 키로 게임을 종료
