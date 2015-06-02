@@ -10,19 +10,19 @@ public class Player : MonoBehaviour {
 	private bool isJumping = false;
 	private Animator animator;
 	private bool isDamaging = false;
-	private Rect windowRect = new Rect ((Screen.width)/4, (Screen.height)/3, (Screen.width)/2, (Screen.height)/3);
+	private Rect windowRect = new Rect ((Screen.width)/4, (Screen.height)/5, (Screen.width)/2, (Screen.height)*3/5);
 	private bool show = false;
 
 	public AudioClip damageSound;
 	public AudioClip jumpSound;
 
 	public static int score = 0;
-	public static int damage = 0;
 
 	public AudioSource jumpSoundSource;
 	public AudioSource damageSoundSource;
 	private bool touchFlag = false;
 	private int dead = 0;
+
 
 	// Use this for initialization
 	void Start () {
@@ -97,16 +97,24 @@ public class Player : MonoBehaviour {
 		else if (this.dead == 3) {
 			Time.timeScale = 0;
 			Debug.Log ("die");
-			Application.LoadLevel(0);
-			Player.score = 0;
-			Stage.globalTime = 0.0f;
+			CheckHighScore();
+			show = true;
 		}
 		/*
 		 * 뒤로가기 키로 게임을 종료
 		 */
 		if(Application.platform == RuntimePlatform.Android)
 		{
-			if(Input.GetKeyDown(KeyCode.Escape))
+			if(this.dead == 3 && Input.GetKeyDown(KeyCode.Escape)) {
+				this.dead = 0;
+				Time.timeScale = 1;
+				Application.LoadLevel (0);
+				Player.score = 0;
+				Stage.globalTime = 0.0f;
+				show = false;
+			}
+
+			else if(Input.GetKeyDown(KeyCode.Escape))
 			{
 				if(show) {					
 					Time.timeScale = 1;
@@ -120,8 +128,9 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	
 	void OnGUI() {
-		GUIStyle myButtonStyle1 = new GUIStyle(GUI.skin.button);
+		GUIStyle myButtonStyle1 = new GUIStyle(GUI.skin.box);
 		myButtonStyle1.fontSize = Screen.height/10;
 		if(show)
 			windowRect = GUI.Window (0, windowRect, DialogWindow, "", myButtonStyle1);
@@ -132,10 +141,12 @@ public class Player : MonoBehaviour {
 		
 		GUIStyle myButtonStyle2 = new GUIStyle(GUI.skin.button);
 		myButtonStyle2.fontSize = Screen.height / 12;
-		float y = Screen.height / 6;
-		
-		if(GUI.Button(new Rect(5, 0, windowRect.width - 10, y), "Restart", myButtonStyle2))
+		float y = Screen.height / 5;
+
+		GUI.Box (new Rect (5, 0, windowRect.width - 10, y), "High Score: " + PlayerPrefs.GetInt ("HighScore"), myButtonStyle2); 
+		if(GUI.Button(new Rect(5, y, windowRect.width - 10, y), "Restart", myButtonStyle2))
 		{
+			dead = 0;
 			Time.timeScale = 1;
 			Application.LoadLevel (0);
 			Player.score = 0;
@@ -143,7 +154,7 @@ public class Player : MonoBehaviour {
 			show = false;
 		}
 		
-		if(GUI.Button(new Rect(5, y, windowRect.width - 10, y), "Exit", myButtonStyle2))
+		if(GUI.Button(new Rect(5, y*2, windowRect.width - 10, y), "Exit", myButtonStyle2))
 		{
 			Application.Quit();
 			show = false;
@@ -184,7 +195,14 @@ public class Player : MonoBehaviour {
 	public void dieStart() {
 		this.dead = 1;
 	}
-	
+
+	public void CheckHighScore()
+	{
+		if (score > PlayerPrefs.GetInt ("HighScore")) {
+			Debug.Log ("Saving Score");
+			PlayerPrefs.SetInt ("HighScore", score/2);
+		}
+	}
 
 	public void OnTriggerEnter2D(Collider2D other) {
 		if (other.gameObject.tag == "Ring" && isDamaging == false) {
